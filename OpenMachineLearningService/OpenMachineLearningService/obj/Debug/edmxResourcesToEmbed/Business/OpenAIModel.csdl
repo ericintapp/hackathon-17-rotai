@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="OpenAIModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Input">
+    <Key>
+      <PropertyRef Name="ScenarioId" />
+      <PropertyRef Name="InputSetId" />
+      <PropertyRef Name="InputId" />
+    </Key>
+    <Property Name="ScenarioId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="InputSetId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="InputId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Value" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="Scenario" Relationship="Self.FK_Inputs_ScenarioId" FromRole="Inputs" ToRole="Scenarios" />
+  </EntityType>
+  <EntityType Name="InputSet">
+    <Key>
+      <PropertyRef Name="ScenarioId" />
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="ScenarioId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Id" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Name" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="Scenario" Relationship="Self.FK_InputSets_ScenarioId" FromRole="InputSets" ToRole="Scenarios" />
+  </EntityType>
+  <EntityType Name="Scenario">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Name" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="Inputs" Relationship="Self.FK_Inputs_ScenarioId" FromRole="Scenarios" ToRole="Inputs" />
+    <NavigationProperty Name="InputSets" Relationship="Self.FK_InputSets_ScenarioId" FromRole="Scenarios" ToRole="InputSets" />
+    <Property Name="Contents" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <Association Name="FK_Inputs_ScenarioId">
+    <End Role="Scenarios" Type="Self.Scenario" Multiplicity="1" />
+    <End Role="Inputs" Type="Self.Input" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Scenarios">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Inputs">
+        <PropertyRef Name="ScenarioId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_InputSets_ScenarioId">
+    <End Role="Scenarios" Type="Self.Scenario" Multiplicity="1" />
+    <End Role="InputSets" Type="Self.InputSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Scenarios">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="InputSets">
+        <PropertyRef Name="ScenarioId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="OpenAIEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Inputs" EntityType="Self.Input" />
+    <EntitySet Name="InputSets" EntityType="Self.InputSet" />
+    <EntitySet Name="Scenarios" EntityType="Self.Scenario" />
+    <AssociationSet Name="FK_Inputs_ScenarioId" Association="Self.FK_Inputs_ScenarioId">
+      <End Role="Scenarios" EntitySet="Scenarios" />
+      <End Role="Inputs" EntitySet="Inputs" />
+    </AssociationSet>
+    <AssociationSet Name="FK_InputSets_ScenarioId" Association="Self.FK_InputSets_ScenarioId">
+      <End Role="Scenarios" EntitySet="Scenarios" />
+      <End Role="InputSets" EntitySet="InputSets" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

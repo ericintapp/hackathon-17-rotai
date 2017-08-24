@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="OpenAIModelStoreContainer" CdmEntityContainer="OpenAIEntities">
+    <EntitySetMapping Name="Inputs">
+      <EntityTypeMapping TypeName="OpenAIModel.Input">
+        <MappingFragment StoreEntitySet="Inputs">
+          <ScalarProperty Name="ScenarioId" ColumnName="ScenarioId" />
+          <ScalarProperty Name="InputSetId" ColumnName="InputSetId" />
+          <ScalarProperty Name="InputId" ColumnName="InputId" />
+          <ScalarProperty Name="Value" ColumnName="Value" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="InputSets">
+      <EntityTypeMapping TypeName="OpenAIModel.InputSet">
+        <MappingFragment StoreEntitySet="InputSets">
+          <ScalarProperty Name="ScenarioId" ColumnName="ScenarioId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Scenarios">
+      <EntityTypeMapping TypeName="OpenAIModel.Scenario">
+        <MappingFragment StoreEntitySet="Scenarios">
+          <ScalarProperty Name="Contents" ColumnName="Contents" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>
