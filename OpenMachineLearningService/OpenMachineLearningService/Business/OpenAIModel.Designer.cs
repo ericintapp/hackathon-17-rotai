@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'C:\Hackathon\OpenMachineLearningService\OpenMachineLearningService\Business\OpenAIModel.edmx'. 
+﻿// T4 code generation is enabled for model 'C:\Hackathon\hackathon-17-rotai\OpenMachineLearningService\OpenMachineLearningService\Business\OpenAIModel.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.

@@ -15,7 +15,7 @@ namespace OpenMachineLearningService.Business
     public partial class InputSet
     {
         public string ScenarioId { get; set; }
-        public string Id { get; set; }
+        public string InputSetId { get; set; }
         public string Name { get; set; }
     
         public virtual Scenario Scenario { get; set; }

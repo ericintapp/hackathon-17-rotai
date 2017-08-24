@@ -5,40 +5,61 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="OpenAIModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Features">
+          <Key>
+            <PropertyRef Name="ScenarioId" />
+            <PropertyRef Name="FeatureId" />
+          </Key>
+          <Property Name="ScenarioId" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="FeatureId" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="Position" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="Inputs">
           <Key>
             <PropertyRef Name="ScenarioId" />
             <PropertyRef Name="InputSetId" />
-            <PropertyRef Name="InputId" />
+            <PropertyRef Name="FeatureId" />
           </Key>
           <Property Name="ScenarioId" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="InputSetId" Type="nvarchar" MaxLength="64" Nullable="false" />
-          <Property Name="InputId" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="FeatureId" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="Value" Type="nvarchar" MaxLength="256" />
         </EntityType>
         <EntityType Name="InputSets">
           <Key>
             <PropertyRef Name="ScenarioId" />
-            <PropertyRef Name="Id" />
+            <PropertyRef Name="InputSetId" />
           </Key>
           <Property Name="ScenarioId" Type="nvarchar" MaxLength="64" Nullable="false" />
-          <Property Name="Id" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="InputSetId" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="256" />
         </EntityType>
         <EntityType Name="Scenarios">
           <Key>
-            <PropertyRef Name="Id" />
+            <PropertyRef Name="ScenarioId" />
           </Key>
-          <Property Name="Id" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="ScenarioId" Type="nvarchar" MaxLength="64" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="256" />
           <Property Name="Contents" Type="ntext" />
         </EntityType>
+        <Association Name="FK_Features_ScenarioId">
+          <End Role="Scenarios" Type="Self.Scenarios" Multiplicity="1" />
+          <End Role="Features" Type="Self.Features" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Scenarios">
+              <PropertyRef Name="ScenarioId" />
+            </Principal>
+            <Dependent Role="Features">
+              <PropertyRef Name="ScenarioId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Inputs_ScenarioId">
           <End Role="Scenarios" Type="Self.Scenarios" Multiplicity="1" />
           <End Role="Inputs" Type="Self.Inputs" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Scenarios">
-              <PropertyRef Name="Id" />
+              <PropertyRef Name="ScenarioId" />
             </Principal>
             <Dependent Role="Inputs">
               <PropertyRef Name="ScenarioId" />
@@ -50,7 +71,7 @@
           <End Role="InputSets" Type="Self.InputSets" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Scenarios">
-              <PropertyRef Name="Id" />
+              <PropertyRef Name="ScenarioId" />
             </Principal>
             <Dependent Role="InputSets">
               <PropertyRef Name="ScenarioId" />
@@ -58,9 +79,14 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="OpenAIModelStoreContainer">
+          <EntitySet Name="Features" EntityType="Self.Features" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Inputs" EntityType="Self.Inputs" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="InputSets" EntityType="Self.InputSets" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Scenarios" EntityType="Self.Scenarios" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Features_ScenarioId" Association="Self.FK_Features_ScenarioId">
+            <End Role="Scenarios" EntitySet="Scenarios" />
+            <End Role="Features" EntitySet="Features" />
+          </AssociationSet>
           <AssociationSet Name="FK_Inputs_ScenarioId" Association="Self.FK_Inputs_ScenarioId">
             <End Role="Scenarios" EntitySet="Scenarios" />
             <End Role="Inputs" EntitySet="Inputs" />
@@ -74,44 +100,67 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="OpenAIModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Feature">
+          <Key>
+            <PropertyRef Name="ScenarioId" />
+            <PropertyRef Name="FeatureId" />
+          </Key>
+          <Property Name="ScenarioId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FeatureId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Scenario" Relationship="Self.FK_Features_ScenarioId" FromRole="Features" ToRole="Scenarios" />
+          <Property Name="Position" Type="Int32" Nullable="false" />
+        </EntityType>
         <EntityType Name="Input">
           <Key>
             <PropertyRef Name="ScenarioId" />
             <PropertyRef Name="InputSetId" />
-            <PropertyRef Name="InputId" />
+            <PropertyRef Name="FeatureId" />
           </Key>
           <Property Name="ScenarioId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="InputSetId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="InputId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FeatureId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Value" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Scenario" Relationship="Self.FK_Inputs_ScenarioId" FromRole="Inputs" ToRole="Scenarios" />
         </EntityType>
         <EntityType Name="InputSet">
           <Key>
             <PropertyRef Name="ScenarioId" />
-            <PropertyRef Name="Id" />
+            <PropertyRef Name="InputSetId" />
           </Key>
           <Property Name="ScenarioId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Id" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="InputSetId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Name" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Scenario" Relationship="Self.FK_InputSets_ScenarioId" FromRole="InputSets" ToRole="Scenarios" />
         </EntityType>
         <EntityType Name="Scenario">
           <Key>
-            <PropertyRef Name="Id" />
+            <PropertyRef Name="ScenarioId" />
           </Key>
-          <Property Name="Id" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ScenarioId" Type="String" MaxLength="64" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Name" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="Contents" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Features" Relationship="Self.FK_Features_ScenarioId" FromRole="Scenarios" ToRole="Features" />
           <NavigationProperty Name="Inputs" Relationship="Self.FK_Inputs_ScenarioId" FromRole="Scenarios" ToRole="Inputs" />
           <NavigationProperty Name="InputSets" Relationship="Self.FK_InputSets_ScenarioId" FromRole="Scenarios" ToRole="InputSets" />
-          <Property Name="Contents" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
+        <Association Name="FK_Features_ScenarioId">
+          <End Role="Scenarios" Type="Self.Scenario" Multiplicity="1" />
+          <End Role="Features" Type="Self.Feature" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Scenarios">
+              <PropertyRef Name="ScenarioId" />
+            </Principal>
+            <Dependent Role="Features">
+              <PropertyRef Name="ScenarioId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Inputs_ScenarioId">
           <End Role="Scenarios" Type="Self.Scenario" Multiplicity="1" />
           <End Role="Inputs" Type="Self.Input" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Scenarios">
-              <PropertyRef Name="Id" />
+              <PropertyRef Name="ScenarioId" />
             </Principal>
             <Dependent Role="Inputs">
               <PropertyRef Name="ScenarioId" />
@@ -123,17 +172,22 @@
           <End Role="InputSets" Type="Self.InputSet" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Scenarios">
-              <PropertyRef Name="Id" />
+              <PropertyRef Name="ScenarioId" />
             </Principal>
             <Dependent Role="InputSets">
               <PropertyRef Name="ScenarioId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="OpenAIEntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="OpenAIEntities1" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Features" EntityType="Self.Feature" />
           <EntitySet Name="Inputs" EntityType="Self.Input" />
           <EntitySet Name="InputSets" EntityType="Self.InputSet" />
           <EntitySet Name="Scenarios" EntityType="Self.Scenario" />
+          <AssociationSet Name="FK_Features_ScenarioId" Association="Self.FK_Features_ScenarioId">
+            <End Role="Scenarios" EntitySet="Scenarios" />
+            <End Role="Features" EntitySet="Features" />
+          </AssociationSet>
           <AssociationSet Name="FK_Inputs_ScenarioId" Association="Self.FK_Inputs_ScenarioId">
             <End Role="Scenarios" EntitySet="Scenarios" />
             <End Role="Inputs" EntitySet="Inputs" />
@@ -148,13 +202,22 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="OpenAIModelStoreContainer" CdmEntityContainer="OpenAIEntities">
+        <EntityContainerMapping StorageEntityContainer="OpenAIModelStoreContainer" CdmEntityContainer="OpenAIEntities1">
+          <EntitySetMapping Name="Features">
+            <EntityTypeMapping TypeName="OpenAIModel.Feature">
+              <MappingFragment StoreEntitySet="Features">
+                <ScalarProperty Name="Position" ColumnName="Position" />
+                <ScalarProperty Name="ScenarioId" ColumnName="ScenarioId" />
+                <ScalarProperty Name="FeatureId" ColumnName="FeatureId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Inputs">
             <EntityTypeMapping TypeName="OpenAIModel.Input">
               <MappingFragment StoreEntitySet="Inputs">
                 <ScalarProperty Name="ScenarioId" ColumnName="ScenarioId" />
                 <ScalarProperty Name="InputSetId" ColumnName="InputSetId" />
-                <ScalarProperty Name="InputId" ColumnName="InputId" />
+                <ScalarProperty Name="FeatureId" ColumnName="FeatureId" />
                 <ScalarProperty Name="Value" ColumnName="Value" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -163,7 +226,7 @@
             <EntityTypeMapping TypeName="OpenAIModel.InputSet">
               <MappingFragment StoreEntitySet="InputSets">
                 <ScalarProperty Name="ScenarioId" ColumnName="ScenarioId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="InputSetId" ColumnName="InputSetId" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -171,9 +234,9 @@
           <EntitySetMapping Name="Scenarios">
             <EntityTypeMapping TypeName="OpenAIModel.Scenario">
               <MappingFragment StoreEntitySet="Scenarios">
-                <ScalarProperty Name="Contents" ColumnName="Contents" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ScenarioId" ColumnName="ScenarioId" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Contents" ColumnName="Contents" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -30,23 +30,30 @@ namespace OpenMachineLearningService.Controllers
 
         [Route("scenario/{scenarioId}/{inputSetId}/input")]
         [HttpPost]
-        public void AddScenarioInput(string scenarioId, string inputSetId, Input input)
+        public void AddScenarioInput(string scenarioId, string inputSetId, Models.Input input)
         {
-
+            new ScenarioManager().CreateInputs(scenarioId, inputSetId, new List<Models.Input> { input });
         }
 
         [HttpPost]
         [Route("scenario/{scenarioId}/{inputSetId}/inputs")]
-        public void AddScenarioInputs(string scenarioId, string inputSetId, Input[] inputs)
+        public void AddScenarioInputs(string scenarioId, string inputSetId, Models.Input[] inputs)
         {
-
+            new ScenarioManager().CreateInputs(scenarioId, inputSetId, inputs.ToList());
         }
 
         [HttpPost]
         [Route("scenario/{scenarioId}/{inputSetId}/_predict")]
         public PredictionSet Predict(string scenarioId, string inputSetId)
         {
-            return new PredictionSet();
+            return new ScenarioManager().Predict(scenarioId, inputSetId);
+        }
+
+        [HttpPost]
+        [Route("scenario/{scenarioId}/_train")]
+        public void Train(string scenarioId)
+        {
+            new ScenarioManager().Train(scenarioId);
         }
     }
 }

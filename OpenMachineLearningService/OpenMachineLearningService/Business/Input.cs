@@ -16,7 +16,7 @@ namespace OpenMachineLearningService.Business
     {
         public string ScenarioId { get; set; }
         public string InputSetId { get; set; }
-        public string InputId { get; set; }
+        public string FeatureId { get; set; }
         public string Value { get; set; }
     
         public virtual Scenario Scenario { get; set; }

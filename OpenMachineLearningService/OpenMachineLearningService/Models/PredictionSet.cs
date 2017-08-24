@@ -7,7 +7,7 @@ namespace OpenMachineLearningService.Models
 {
     public class PredictionSet
     {
-        public KeyValuePair<string, Prediction>[] Predictions { get; set; }
+        public List<Prediction> Predictions { get; set; }
 
     }
 }

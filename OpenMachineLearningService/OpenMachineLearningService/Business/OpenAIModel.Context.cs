@@ -13,10 +13,10 @@ namespace OpenMachineLearningService.Business
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class OpenAIEntities : DbContext
+    public partial class OpenAIEntities1 : DbContext
     {
-        public OpenAIEntities()
-            : base("name=OpenAIEntities")
+        public OpenAIEntities1()
+            : base("name=OpenAIEntities1")
         {
         }
     
@@ -25,6 +25,7 @@ namespace OpenMachineLearningService.Business
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<Feature> Features { get; set; }
         public virtual DbSet<Input> Inputs { get; set; }
         public virtual DbSet<InputSet> InputSets { get; set; }
         public virtual DbSet<Scenario> Scenarios { get; set; }
