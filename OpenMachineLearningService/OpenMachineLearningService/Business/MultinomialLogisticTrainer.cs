@@ -12,9 +12,9 @@ namespace OpenMachineLearningService.Business
     using Accord.Statistics.Models.Regression;
     using Accord.Statistics.Models.Regression.Fitting;
 
-    public class MultinomialLogisticTrainer : ITrainer<MultinomialLogisticRegression>
+    public class MultinomialLogisticTrainer : ITrainer<TrainerHelper>
     {
-        public MultinomialLogisticRegression Train(System.Data.DataTable table, string columnName)
+        public TrainerHelper Train(System.Data.DataTable table, string columnName)
         {
             var trainingCodification = new Codification()
             {
@@ -32,10 +32,10 @@ namespace OpenMachineLearningService.Business
                 Tolerance = 1e-6
             };
             var mlr = lbnr.Learn(inputs, outputs);
-            return mlr;
+            return new TrainerHelper { MultinomialLogisticRegression = mlr };
         }
 
-        public KeyValuePair<string, double> Decide(MultinomialLogisticRegression trainer, string[] inputs, string columnName)
+        public KeyValuePair<string, double> Decide(TrainerHelper trainer, string[] inputs, string columnName)
         {
             return new KeyValuePair<string, double>("Test", new Random().Next(0, 100));
         }

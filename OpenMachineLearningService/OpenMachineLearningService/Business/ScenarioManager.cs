@@ -47,11 +47,11 @@ namespace OpenMachineLearningService.Business
         /// <param name="inputs">
         /// The inputs.
         /// </param>
-        public void CreateInputs(string scenarioId, string inputSetId, List<Models.Input> inputs)
+        public PredictionSet CreateInputs(string scenarioId, string inputSetId, List<Models.Input> inputs)
         {
             if (inputs == null)
             {
-                return;
+                return new PredictionSet();
             }
 
             using (var dbContext = new OpenAIEntities1())
@@ -88,6 +88,8 @@ namespace OpenMachineLearningService.Business
 
                 dbContext.SaveChanges();
             }
+
+            return this.Predict(scenarioId, inputSetId);
         }
 
         /// <summary>
@@ -200,12 +202,12 @@ namespace OpenMachineLearningService.Business
 
                 string[] sortedInputs = tempInputs.ToArray();
 
-                var trainer = new DummyTrainer();
+                var trainer = new MultinomialLogisticTrainer();
                 List<string> unset =
                     features.Select(f => f.FeatureId).Except(inputsById.Values.Select(i => i.FeatureId)).ToList();
                 foreach (string inputId in unset)
                 {
-                    string training;
+                    TrainerHelper training;
                     if (!trainings.TrainingByFeatureId.TryGetValue(inputId, out training))
                     {
                         continue;
@@ -246,18 +248,19 @@ namespace OpenMachineLearningService.Business
                 }
 
                 DataTable table = this.ParseCsv(scenario.Contents);
-                var trainer = new DummyTrainer();
+                var trainer = new MultinomialLogisticTrainer();
 
                 // Get hypothesis for each feature / output
                 var trainings = new ScenarioTrainings
                                     {
                                         ScenarioId = scenarioId, 
-                                        TrainingByFeatureId = new Dictionary<string, string>()
+                                        TrainingByFeatureId = new Dictionary<string, TrainerHelper>()
                                     };
+
                 trainingByScenario[scenarioId] = trainings;
                 foreach (DataColumn column in table.Columns)
                 {
-                    string thing = trainer.Train(table, column.ColumnName);
+                    TrainerHelper thing = trainer.Train(table, column.ColumnName);
                     trainings.TrainingByFeatureId[column.ColumnName] = thing;
                 }
 

@@ -7,10 +7,8 @@ namespace OpenMachineLearningService.Business
 {
     using Accord.Statistics.Models.Regression;
 
-    public class ScenarioTrainings
+    public class TrainerHelper
     {
-        public string ScenarioId { get; set; }
-
-        public Dictionary<string, TrainerHelper> TrainingByFeatureId { get; set; }
+        public MultinomialLogisticRegression MultinomialLogisticRegression { get; set; }
     }
 }

@@ -253,7 +253,6 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
-    <Compile Include="Business\DummyTrainer.cs" />
     <Compile Include="Business\Feature.cs">
       <DependentUpon>OpenAIModel.tt</DependentUpon>
     </Compile>
@@ -285,6 +284,7 @@
     <Compile Include="Business\ScenarioTrainings.cs" />
     <Compile Include="Business\ScenarioManager.cs" />
     <Compile Include="Business\ITrainer.cs" />
+    <Compile Include="Business\TrainerHelper.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\OpenAIController.cs" />
     <Compile Include="Global.asax.cs">
