@@ -551,10 +551,102 @@
         </member>
         <member name="M:OpenMachineLearningService.Controllers.OpenAIController.CreateScenario(OpenMachineLearningService.Models.Scenario)">
             <summary>
-            Creates the scenario.
+            Creates or updates the scenario.  A scenario consists of the scenario ID, definition of the features and training data.
             </summary>
-            <param name="scenarioId"></param>
-            <param name="csvContents">Contains content for csv delimited data in which first row contains input Ids</param>
+            <param name="scenario">The scenario.</param>
+        </member>
+        <member name="M:OpenMachineLearningService.Controllers.OpenAIController.AddScenarioInput(System.String,System.String,OpenMachineLearningService.Models.Input)">
+            <summary>
+            Adds input data to an input set that is currently in progress.  Based on this new input as well as existing input, 
+            a set of predictions for unspecified input is returned. 
+            </summary>
+            <param name="scenarioId">The scenario ID</param>
+            <param name="inputSetId">The input set ID</param>
+            <param name="input">The new input</param>
+            <returns>Predictions of unspecified data.</returns>
+        </member>
+        <member name="M:OpenMachineLearningService.Controllers.OpenAIController.AddScenarioInputs(System.String,System.String,OpenMachineLearningService.Models.Input[])">
+            <summary>
+            Adds the list of input data to an input set that is currently in progress.  Based on this new input as well as existing input, 
+            a set of predictions for unspecified input is returned. 
+            </summary>
+            <param name="scenarioId">The scenario ID.</param>
+            <param name="inputSetId">The input set ID.</param>
+            <returns>Predictions of unspecified inputs.</returns>
+        </member>
+        <member name="M:OpenMachineLearningService.Controllers.OpenAIController.Predict(System.String,System.String)">
+            <summary>
+            Predicts output for any unspecified inputs for the input set.
+            </summary>
+            <param name="scenarioId">The scenario ID.</param>
+            <param name="inputSetId">The input set ID.</param>
+            <returns>Predictions of unspecified inputs.</returns>
+        </member>
+        <member name="M:OpenMachineLearningService.Controllers.OpenAIController.Train(System.String)">
+            <summary>
+            Trains the scenario.  This is called implicitly when appropriate, but is provided here for demo purposes.
+            </summary>
+            <param name="scenarioId">The scenario ID.</param>
+        </member>
+        <member name="T:OpenMachineLearningService.Models.Input">
+            <summary>
+            Defines an input.
+            </summary>
+        </member>
+        <member name="P:OpenMachineLearningService.Models.Input.InputId">
+            <summary>
+            The input (or feature) ID.
+            </summary>
+        </member>
+        <member name="P:OpenMachineLearningService.Models.Input.Value">
+            <summary>
+            The value of the input.
+            </summary>
+        </member>
+        <member name="T:OpenMachineLearningService.Models.Prediction">
+            <summary>
+            Defines a prediction.
+            </summary>
+        </member>
+        <member name="P:OpenMachineLearningService.Models.Prediction.InputId">
+            <summary>
+            The input (feature) ID.
+            </summary>
+        </member>
+        <member name="P:OpenMachineLearningService.Models.Prediction.Value">
+            <summary>
+            The predicted value.
+            </summary>
+        </member>
+        <member name="P:OpenMachineLearningService.Models.Prediction.Confidence">
+            <summary>
+            The confidence in the predicted value.
+            </summary>
+        </member>
+        <member name="T:OpenMachineLearningService.Models.PredictionSet">
+            <summary>
+            Defines the predictions for unspecified input.
+            </summary>
+        </member>
+        <member name="P:OpenMachineLearningService.Models.PredictionSet.Predictions">
+            <summary>
+            The predictions for unspecified input.
+            </summary>
+        </member>
+        <member name="P:OpenMachineLearningService.Models.Scenario.Id">
+            <summary>
+            The scenario ID.
+            </summary>
+        </member>
+        <member name="P:OpenMachineLearningService.Models.Scenario.Name">
+            <summary>
+            The scenario name.
+            </summary>
+        </member>
+        <member name="P:OpenMachineLearningService.Models.Scenario.Contents">
+            <summary>
+            The contents of the scenario in csv delimited format.  The header row must specify the IDs of the features.
+            </summary>
         </member>
     </members>
 </doc>

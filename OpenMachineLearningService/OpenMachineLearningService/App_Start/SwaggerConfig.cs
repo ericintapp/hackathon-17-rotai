@@ -103,7 +103,7 @@ namespace OpenMachineLearningService
                         // those comments into the generated docs and UI. You can enable this by providing the path to one or
                         // more Xml comment files.
                         //
-                        var xmlPath = AppDomain.CurrentDomain.BaseDirectory + @"bin\app_data\OpenMachineLearningService.XML";
+                        var xmlPath = AppDomain.CurrentDomain.BaseDirectory + @"bin\OpenMachineLearningService.XML";
                         c.IncludeXmlComments(xmlPath);
 
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
@@ -179,9 +179,11 @@ namespace OpenMachineLearningService
                         // alternative implementation for ISwaggerProvider with the CustomProvider option.
                         //
                         //c.CustomProvider((defaultProvider) => new CachingSwaggerProvider(defaultProvider));
+                
                     })
                 .EnableSwaggerUi(c =>
                     {
+                        c.DisableValidator();
                         // Use the "DocumentTitle" option to change the Document title.
                         // Very helpful when you have multiple Swagger pages open, to tell them apart.
                         //

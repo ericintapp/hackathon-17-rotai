@@ -94,7 +94,7 @@ namespace OpenMachineLearningService.Business
             {
                 confidence = confidences[0];
             }
-            KeyValuePair<string, Double> keyValuePair = new KeyValuePair<string, Double>(predictedValue, confidence);
+            KeyValuePair<string, Double> keyValuePair = new KeyValuePair<string, Double>(predictedValue, confidence*100);
             return keyValuePair;
         }
     }

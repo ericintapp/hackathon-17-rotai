@@ -121,7 +121,7 @@ namespace OpenMachineLearningService.Business
                 {
                     if (entity.Features.Any(f => f.FeatureId == column.ColumnName))
                     {
-                        return;
+                        continue;
                     }
 
                     var feature = new Feature();
@@ -218,7 +218,7 @@ namespace OpenMachineLearningService.Business
 
                     if (valueAndConfidence.Key == null)
                     {
-                        continue;
+                        //continue;
                     }
 
                     var prediction = new Prediction
