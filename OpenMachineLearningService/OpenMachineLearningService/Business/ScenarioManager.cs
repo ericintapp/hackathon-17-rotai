@@ -10,6 +10,7 @@ namespace OpenMachineLearningService.Business
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
     using System.Data;
     using System.IO;
     using System.Linq;
@@ -168,7 +169,7 @@ namespace OpenMachineLearningService.Business
         {
             var predictions = new PredictionSet { Predictions = new List<Prediction>() };
             ScenarioTrainings trainings;
-            if (trainingByScenario.TryGetValue(scenarioId, out trainings))
+            if (!trainingByScenario.TryGetValue(scenarioId, out trainings))
             {
                 trainings = this.Train(scenarioId);
             }
@@ -186,21 +187,20 @@ namespace OpenMachineLearningService.Business
                     dbContext.Inputs.Where(i => i.ScenarioId == scenarioId && i.InputSetId == inputSetId)
                         .ToDictionary(i => i.FeatureId);
 
-                var tempInputs = new List<string>();
+                var sortedInputs = new List<Input>();
                 foreach (Feature feature in features)
                 {
                     Input input;
                     if (inputsById.TryGetValue(feature.FeatureId, out input))
                     {
-                        tempInputs.Add(input.Value);
+                        sortedInputs.Add(input);
                     }
                     else
                     {
-                        tempInputs.Add(null);
+                        sortedInputs.Add(new Input { FeatureId = feature.FeatureId });
                     }
                 }
 
-                string[] sortedInputs = tempInputs.ToArray();
 
                 var trainer = new MultinomialLogisticTrainer();
                 List<string> unset =
@@ -213,7 +213,13 @@ namespace OpenMachineLearningService.Business
                         continue;
                     }
 
-                    KeyValuePair<string, double> valueAndConfidence = trainer.Decide(training, sortedInputs, inputId);
+                    var inputsMinusFeature = sortedInputs.Where(i => i.FeatureId != inputId).Select(i => i.Value).ToArray();
+                    KeyValuePair<string, double> valueAndConfidence = trainer.Decide(training, inputsMinusFeature, inputId);
+
+                    if (valueAndConfidence.Key == null)
+                    {
+                        continue;
+                    }
 
                     var prediction = new Prediction
                                          {

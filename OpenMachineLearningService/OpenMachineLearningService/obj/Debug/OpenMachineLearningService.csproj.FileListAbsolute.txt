@@ -170,3 +170,4 @@ C:\Hackathon\hackathon-17-rotai\OpenMachineLearningService\OpenMachineLearningSe
 C:\Hackathon\hackathon-17-rotai\OpenMachineLearningService\OpenMachineLearningService\bin\tr\ZedGraph.resources.dll
 C:\Hackathon\hackathon-17-rotai\OpenMachineLearningService\OpenMachineLearningService\bin\zh-cn\ZedGraph.resources.dll
 C:\Hackathon\hackathon-17-rotai\OpenMachineLearningService\OpenMachineLearningService\bin\zh-tw\ZedGraph.resources.dll
+C:\Hackathon\hackathon-17-rotai\OpenMachineLearningService\OpenMachineLearningService\bin\OpenMachineLearningService.XML

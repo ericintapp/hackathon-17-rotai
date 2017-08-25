@@ -7,6 +7,8 @@ using Swashbuckle.Application;
 
 namespace OpenMachineLearningService
 {
+    using System;
+
     public class SwaggerConfig
     {
         public static void Register()
@@ -101,7 +103,8 @@ namespace OpenMachineLearningService
                         // those comments into the generated docs and UI. You can enable this by providing the path to one or
                         // more Xml comment files.
                         //
-                        //c.IncludeXmlComments(GetXmlCommentsPath());
+                        var xmlPath = AppDomain.CurrentDomain.BaseDirectory + @"bin\app_data\OpenMachineLearningService.XML";
+                        c.IncludeXmlComments(xmlPath);
 
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
                         // exposed in your API. However, there may be occasions when more control of the output is needed.
