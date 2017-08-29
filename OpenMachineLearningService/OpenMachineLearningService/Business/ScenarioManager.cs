@@ -17,6 +17,8 @@ namespace OpenMachineLearningService.Business
 
     using Accord.IO;
 
+    using Microsoft.Ajax.Utilities;
+
     using OpenMachineLearningService.Models;
 
     /// <summary>
@@ -35,6 +37,44 @@ namespace OpenMachineLearningService.Business
         #endregion
 
         #region Public Methods and Operators
+
+        public void CompleteInputSet(string scenarioId, string inputSetId)
+        {
+            using (var dbContext = new OpenAIEntities1())
+            {
+                Scenario entity = dbContext.Scenarios.Find(scenarioId);
+                if (entity == null)
+                {
+                    throw new Exception(string.Format("Unable to find scenario for {0}", scenarioId));
+                }
+                
+                List<Feature> features =
+                    dbContext.Features.Where(f => f.ScenarioId == scenarioId).OrderBy(f => f.Position).ToList();
+                Dictionary<string, Input> inputsById =
+                    dbContext.Inputs.Where(i => i.ScenarioId == scenarioId && i.InputSetId == inputSetId)
+                        .ToDictionary(i => i.FeatureId);
+
+                var sortedInputs = new List<Input>();
+                foreach (Feature feature in features)
+                {
+                    Input input;
+                    if (inputsById.TryGetValue(feature.FeatureId, out input))
+                    {
+                        sortedInputs.Add(input);
+                    }
+                    else
+                    {
+                        sortedInputs.Add(new Input { FeatureId = feature.FeatureId });
+                    }
+                }
+
+                var newData = string.Join(",", sortedInputs.Select(i => i.Value ?? "0"));
+                entity.Contents = entity.Contents + Environment.NewLine + newData;
+                dbContext.SaveChanges();
+                this.Train(scenarioId);
+            }
+
+        }
 
         /// <summary>
         /// The create inputs.
@@ -153,6 +193,8 @@ namespace OpenMachineLearningService.Business
             }
         }
 
+        private ITrainer<TrainerHelper> trainer = new MultinomialLogisticTrainer();
+ 
         /// <summary>
         /// The predict.
         /// </summary>
@@ -202,7 +244,6 @@ namespace OpenMachineLearningService.Business
                 }
 
 
-                var trainer = new MultinomialLogisticTrainer();
                 List<string> unset =
                     features.Select(f => f.FeatureId).Except(inputsById.Values.Select(i => i.FeatureId)).ToList();
                 foreach (string inputId in unset)
@@ -215,11 +256,6 @@ namespace OpenMachineLearningService.Business
 
                     var inputsMinusFeature = sortedInputs.Where(i => i.FeatureId != inputId).Select(i => i.Value).ToArray();
                     KeyValuePair<string, double> valueAndConfidence = trainer.Decide(training, inputsMinusFeature, inputId);
-
-                    if (valueAndConfidence.Key == null)
-                    {
-                        //continue;
-                    }
 
                     var prediction = new Prediction
                                          {
@@ -254,7 +290,6 @@ namespace OpenMachineLearningService.Business
                 }
 
                 DataTable table = this.ParseCsv(scenario.Contents);
-                var trainer = new MultinomialLogisticTrainer();
 
                 // Get hypothesis for each feature / output
                 var trainings = new ScenarioTrainings
@@ -271,6 +306,45 @@ namespace OpenMachineLearningService.Business
                 }
 
                 return trainings;
+            }
+        }
+
+        /// <summary>
+        /// Tests the prediction using the current algorithm on the supplied data.
+        /// </summary>
+        /// <param name="scenarioId">
+        /// The scenario id.
+        /// </param>
+        /// <returns>
+        /// The predictions for the specified feature ID.
+        /// </returns>
+        public TestPredictions Test(string scenarioId, string featureId, Contents contents)
+        {
+            using (var dbContext = new OpenAIEntities1())
+            {
+                var scenario = dbContext.Scenarios.Find(scenarioId);
+                if (scenario == null)
+                {
+                    return null;
+                }
+
+                ScenarioTrainings trainings;
+                if (!trainingByScenario.TryGetValue(scenarioId, out trainings))
+                {
+                    trainings = this.Train(scenarioId);
+                }
+
+                var table = this.ParseCsv(contents.Data);
+
+                TrainerHelper training;
+                if (!trainings.TrainingByFeatureId.TryGetValue(featureId, out training))
+                {
+                    return null;
+                }
+
+                var predictions = trainer.Decide(training, table, featureId);
+
+                return predictions;
             }
         }
 

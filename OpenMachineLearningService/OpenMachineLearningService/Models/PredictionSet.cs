@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace OpenMachineLearningService.Models
+﻿namespace OpenMachineLearningService.Models
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// Defines the predictions for unspecified input.
     /// </summary>

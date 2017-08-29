@@ -481,6 +481,29 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="T:OpenMachineLearningService.Business.ITrainer`1">
+            <summary>
+            Interface for training and predicting data.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:OpenMachineLearningService.Business.ITrainer`1.Train(System.Data.DataTable,System.String)">
+            <summary>
+            Trains the data to solve for the specified feature ID.
+            </summary>
+            <param name="table">The table</param>
+            <param name="featureId">The feature ID</param>
+            <returns>The trainer (used to predict)</returns>
+        </member>
+        <member name="M:OpenMachineLearningService.Business.ITrainer`1.Decide(`0,System.String[],System.String)">
+            <summary>
+            Given the inputs, predicts for the feature ID.
+            </summary>
+            <param name="trainer">The trainer</param>
+            <param name="inputs">The inputs</param>
+            <param name="featureId">The output feature</param>
+            <returns>The predicted result and confidence</returns>
+        </member>
         <member name="T:OpenMachineLearningService.Business.ScenarioManager">
             <summary>
                 The scenario manager.
@@ -549,58 +572,114 @@
             The <see cref="T:OpenMachineLearningService.Business.ScenarioTrainings"/>.
             </returns>
         </member>
-        <member name="M:OpenMachineLearningService.Controllers.OpenAIController.CreateScenario(OpenMachineLearningService.Models.Scenario)">
+        <member name="M:OpenMachineLearningService.Business.ScenarioManager.Test(System.String,System.String,OpenMachineLearningService.Models.Contents)">
             <summary>
-            Creates or updates the scenario.  A scenario consists of the scenario ID, definition of the features and training data.
+            Tests the prediction using the current algorithm on the supplied data.
             </summary>
-            <param name="scenario">The scenario.</param>
+            <param name="scenarioId">
+            The scenario id.
+            </param>
+            <returns>
+            The predictions for the specified feature ID.
+            </returns>
+        </member>
+        <member name="T:OpenMachineLearningService.Controllers.OpenAIController">
+            <summary>
+            The open ai controller.
+            </summary>
         </member>
         <member name="M:OpenMachineLearningService.Controllers.OpenAIController.AddScenarioInput(System.String,System.String,OpenMachineLearningService.Models.Input)">
             <summary>
-            Adds input data to an input set that is currently in progress.  Based on this new input as well as existing input, 
-            a set of predictions for unspecified input is returned. 
+            Adds input data to an input set that is currently in progress.  Based on this new input as well as existing input,
+                a set of predictions for unspecified input is returned.
             </summary>
-            <param name="scenarioId">The scenario ID</param>
-            <param name="inputSetId">The input set ID</param>
-            <param name="input">The new input</param>
-            <returns>Predictions of unspecified data.</returns>
+            <param name="scenarioId">
+            The scenario ID
+            </param>
+            <param name="inputSetId">
+            The input set ID
+            </param>
+            <param name="input">
+            The new input
+            </param>
+            <returns>
+            Predictions of unspecified data.
+            </returns>
+        </member>
+        <member name="M:OpenMachineLearningService.Controllers.OpenAIController.FinishInputSet(System.String,System.String)">
+            <summary>
+            Marks the input set as complete, and updates aglorithm with new input set.
+            </summary>
+            <param name="scenarioId">
+            The scenario ID
+            </param>
+            <param name="inputSetId">
+            The input set ID
+            </param>
         </member>
         <member name="M:OpenMachineLearningService.Controllers.OpenAIController.AddScenarioInputs(System.String,System.String,OpenMachineLearningService.Models.Input[])">
             <summary>
-            Adds the list of input data to an input set that is currently in progress.  Based on this new input as well as existing input, 
-            a set of predictions for unspecified input is returned. 
+            Adds the list of input data to an input set that is currently in progress.  Based on this new input as well as
+                existing input,
+                a set of predictions for unspecified input is returned.
             </summary>
-            <param name="scenarioId">The scenario ID.</param>
-            <param name="inputSetId">The input set ID.</param>
-            <returns>Predictions of unspecified inputs.</returns>
+            <param name="scenarioId">
+            The scenario ID.
+            </param>
+            <param name="inputSetId">
+            The input set ID.
+            </param>
+            <param name="inputs">
+            The inputs
+            </param>
+            <returns>
+            Predictions of unspecified inputs.
+            </returns>
+        </member>
+        <member name="M:OpenMachineLearningService.Controllers.OpenAIController.CreateScenario(OpenMachineLearningService.Models.Scenario)">
+            <summary>
+            Creates or updates the scenario.  A scenario consists of the scenario ID, definition of the features and training
+                data.
+            </summary>
+            <param name="scenario">
+            The scenario.
+            </param>
         </member>
         <member name="M:OpenMachineLearningService.Controllers.OpenAIController.Predict(System.String,System.String)">
             <summary>
-            Predicts output for any unspecified inputs for the input set.
+            Predicts output for any unspecified inputs.
             </summary>
-            <param name="scenarioId">The scenario ID.</param>
-            <param name="inputSetId">The input set ID.</param>
-            <returns>Predictions of unspecified inputs.</returns>
+            <param name="scenarioId">
+            The scenario ID.
+            </param>
+            <param name="inputSetId">
+            The input set ID.
+            </param>
+            <returns>
+            Predictions of unspecified inputs.
+            </returns>
         </member>
         <member name="M:OpenMachineLearningService.Controllers.OpenAIController.Train(System.String)">
             <summary>
             Trains the scenario.  This is called implicitly when appropriate, but is provided here for demo purposes.
             </summary>
-            <param name="scenarioId">The scenario ID.</param>
+            <param name="scenarioId">
+            The scenario ID.
+            </param>
         </member>
         <member name="T:OpenMachineLearningService.Models.Input">
             <summary>
-            Defines an input.
+                Defines an input.
             </summary>
         </member>
         <member name="P:OpenMachineLearningService.Models.Input.InputId">
             <summary>
-            The input (or feature) ID.
+                The input (or feature) ID.
             </summary>
         </member>
         <member name="P:OpenMachineLearningService.Models.Input.Value">
             <summary>
-            The value of the input.
+                The value of the input.
             </summary>
         </member>
         <member name="T:OpenMachineLearningService.Models.Prediction">

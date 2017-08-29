@@ -6,23 +6,21 @@ using System.Web;
 namespace OpenMachineLearningService.Business
 {
     using System.Data;
-    using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
-    using System.IO;
     using System.Text;
 
-    using Accord.Extensions.Math.Geometry;
     using Accord.MachineLearning.Bayes;
+    using Accord.MachineLearning.DecisionTrees;
+    using Accord.MachineLearning.DecisionTrees.Learning;
     using Accord.Math;
     using Accord.Statistics.Distributions.Fitting;
     using Accord.Statistics.Distributions.Univariate;
     using Accord.Statistics.Filters;
-    using Accord.Statistics.Kernels;
     using Accord.Statistics.Models.Regression;
     using Accord.Statistics.Models.Regression.Fitting;
 
     using OpenMachineLearningService.Models;
 
-    public class MultinomialLogisticTrainer : ITrainer<TrainerHelper>
+    public class DecisionTreeLogisticTrainer : ITrainer<TrainerHelper>
     {
 
         public double[] ExpandRow(Codification codification, double[] row, int columnToSkip)
@@ -62,30 +60,24 @@ namespace OpenMachineLearningService.Business
                 table.Columns.Cast<DataColumn>().Select(x => x.ColumnName).Where(s => s != columnName).ToArray();
 
             var columnOrdinal = table.Columns[columnName].Ordinal;
-            double[][] tempInputs = symbols.ToJagged(container.columnNamesArray);
+            int[][] tempInputs = symbols.ToJagged<int>(container.columnNamesArray);
             double[][] inputs = new double[tempInputs.Length][];
             for (var i = 0; i < tempInputs.Length; i++)
             {
-                var flattened = this.ExpandRow(trainingCodification, tempInputs[i], columnOrdinal);
-                inputs[i] = flattened;
+               // var flattened = this.ExpandRow(trainingCodification, tempInputs[i], columnOrdinal);
+               // inputs[i] = flattened;
             }
 
 
             int[] outputs = symbols.ToArray<int>(columnName);
-         
-            var teacher = new NaiveBayesLearning<NormalDistribution>();
 
-            // Set options for the component distributions
-            teacher.Options.InnerOption = new NormalOptions
-            {
-                Regularization = 1e-5 // to avoid zero variances
-            };
+            var id3learning = new ID3Learning();
 
-            if (inputs.Length > 0)
-            {
-                NaiveBayes<NormalDistribution> learner = teacher.Learn(inputs, outputs);
-                container.trainer = learner;
-            }
+            id3learning.Attributes = DecisionVariable.FromCodebook(trainingCodification);
+            // Learn the training instances!
+            DecisionTree tree = id3learning.Learn(tempInputs, outputs);
+            container.decisionTree = tree;
+           
 
             //var lbnr = new LowerBoundNewtonRaphson() { MaxIterations = 100, Tolerance = 1e-6 };
             //var mlr = lbnr.Learn(inputs, outputs);
@@ -121,23 +113,22 @@ namespace OpenMachineLearningService.Business
                     catch
                     {
                         inputsList.Add(unspecified);
-                        
+
                     }
                 }
                 i++;
-
             }
 
             double[] testInputs = inputsList.ToArray<double>();
-            int predicted = container.trainer.Decide(testInputs);
+            int predicted = container.decisionTree.Decide(testInputs);
             string predictedValue = container.codification.Revert(columnName, predicted);
-            var confidences = container.trainer.Probabilities(testInputs);
+            //var confidences = container.decisionTree. (testInputs);
             var confidence = 0.0;
-            if (confidences.Length > 1)
+            //if (confidences.Length > 0)
             {
-                confidence = confidences.Max();
+                //confidence = confidences[0];
             }
-            KeyValuePair<string, Double> keyValuePair = new KeyValuePair<string, Double>(predictedValue, confidence*100);
+            KeyValuePair<string, Double> keyValuePair = new KeyValuePair<string, Double>(predictedValue, confidence * 100);
             return keyValuePair;
         }
 
@@ -156,51 +147,67 @@ namespace OpenMachineLearningService.Business
             var columnOrdinal = table.Columns[inputId].Ordinal;
             double[][] tempInputs = symbols.ToJagged(container.columnNamesArray);
             double[][] inputs = new double[tempInputs.Length][];
+            for (var i = 0; i < tempInputs.Length; i++)
+            {
+                var flattened = this.ExpandRow(container.codification, tempInputs[i], columnOrdinal);
+                inputs[i] = flattened;
+            }
 
 
 
-
+            int[] outputs = symbols.ToArray<int>(inputId);
 
 
 
             var foo = new TestPredictions();
             var predictions = new List<KeyValuePair<string, double>>();
+            //foo.Predictions = predictions;
+            var predicted = container.decisionTree.Decide(inputs);
+            var predictedValues = container.codification.Revert(inputId, predicted);
+            //var confidences = container.trainer.Probabilities(inputs);
             var correct = 0;
             var incorrect = 0;
             var contents = new StringBuilder();
-            foreach (DataRow x in table.Rows)
+            for (var i = 0; i < predicted.Length; i++)
             {
-                var values = x.ItemArray.Select(c => c.ToString()).ToList();
-                var answer = values[columnOrdinal];
-                values.RemoveAt(columnOrdinal);
-                var prediction = this.Decide(container, values.ToArray(), inputId);
+                var predictedAsInt = predicted[i];
+                var actualValue = outputs[i];
 
-                contents.Append(string.Format("{0},{1},{2}" + Environment.NewLine, answer, prediction.Key, prediction.Value));
-                if (answer == prediction.Key)
+                var predictedValue = predictedValues[i];
+                //var c = confidences[i];
+                var p = 0.0;
+                //if (c.Length > 0)
+                {
+                    //p = c[0];
+                }
+
+                p = p * 100;
+                if (predictedAsInt == actualValue)
                 {
                     correct++;
                 }
                 else
                 {
-                    if (prediction.Value > 75)
+                    if (p > 75)
                     {
                         incorrect++;
                     }
                 }
 
+                var a = new KeyValuePair<string, Double>(predictedValue, p);
+                predictions.Add(a);
+
+                contents.Append(string.Format("{0},{1},{2}" + Environment.NewLine, actualValue, predictedValue, p));
+
             }
 
-            File.WriteAllText(@"c:\temp\hack1.txt", contents.ToString());
-
-            int[] outputs = symbols.ToArray<int>(inputId);
-
-            foo.Total = table.Rows.Count;
+            foo.Total = predicted.Length;
             foo.Correct = correct;
             foo.Incorrect = incorrect;
             foo.Contents = contents.ToString();
             return foo;
         }
 
-    
+
     }
 }

@@ -9,6 +9,7 @@ namespace OpenMachineLearningService.Business
 
     using Accord.MachineLearning;
     using Accord.MachineLearning.Bayes;
+    using Accord.MachineLearning.DecisionTrees;
     using Accord.Statistics.Distributions.Univariate;
     using Accord.Statistics.Filters;
     using Accord.Statistics.Models.Regression;
@@ -18,6 +19,8 @@ namespace OpenMachineLearningService.Business
         public Codification codification;
         public NaiveBayes<NormalDistribution> trainer;
         public string[] columnNamesArray;
-        public DataTable symbols; 
+        public DataTable symbols;
+
+        public DecisionTree decisionTree;
     }
 }
